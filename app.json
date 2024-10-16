@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "top.hsuni.calliope"
+      "package": "com.sunnychh.calliope"
     },
     "web": {
       "bundler": "metro",

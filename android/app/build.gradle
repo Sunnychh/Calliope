@@ -109,9 +109,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'top.hsuni.calliope'
+    namespace 'com.sunnychh.calliope'
     defaultConfig {
-        applicationId 'top.hsuni.calliope'
+        applicationId 'com.sunnychh.calliope'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

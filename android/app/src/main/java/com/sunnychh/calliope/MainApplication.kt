@@ -1,4 +1,4 @@
-package top.hsuni.calliope
+package com.sunnychh.calliope
 
 import android.app.Application
 import android.content.res.Configuration
