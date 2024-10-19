@@ -3,6 +3,7 @@
     "name": "Calliope",
     "slug": "Calliope",
     "version": "1.0.0",
+    "entryPoint": "./app/index.tsx",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
