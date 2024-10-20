@@ -1,3 +1,4 @@
+import { clamp } from "@/tools/tool";
 import { NativeModulesType } from "@/types/NativeModules";
 import React, { useEffect, useRef } from "react";
 import {
@@ -9,6 +10,7 @@ import {
   NativeModules,
   PanResponder,
   PanResponderInstance,
+  Dimensions,
 } from "react-native";
 
 const { FloatingWindowService } = NativeModules as NativeModulesType;
@@ -24,6 +26,9 @@ export const FloatWindowComponent = (props: InitialProps) => {
     initMouseLocal: [0, 0],
     initWindowGlobal: props.initPosition,
     newWindowGlobal: props.initPosition,
+    windowSize: ((window) => [window.width, window.height] as [number, number])(
+      Dimensions.get("window")
+    ),
 
     isDragging: false,
     isMoving: false,
@@ -34,10 +39,7 @@ export const FloatWindowComponent = (props: InitialProps) => {
     if (e.nativeEvent.identifier.toString() !== "0") {
       return;
     }
-    posRef.current.initMouseLocal = [
-      e.nativeEvent.pageX,
-      e.nativeEvent.pageY,
-    ]
+    posRef.current.initMouseLocal = [e.nativeEvent.pageX, e.nativeEvent.pageY];
     posRef.current.initMouseGlobal = [
       e.nativeEvent.pageX + posRef.current.initWindowGlobal[0],
       e.nativeEvent.pageY + posRef.current.initWindowGlobal[1],
@@ -54,8 +56,20 @@ export const FloatWindowComponent = (props: InitialProps) => {
     }
 
     const newWindowGlobal: [number, number] = [
-      2 * posRef.current.initWindowGlobal[0] + e.nativeEvent.pageX - posRef.current.initMouseGlobal[0],
-      2 * posRef.current.initWindowGlobal[1] + e.nativeEvent.pageY - posRef.current.initMouseGlobal[1],
+      clamp(
+        2 * posRef.current.initWindowGlobal[0] +
+          e.nativeEvent.pageX -
+          posRef.current.initMouseGlobal[0],
+        0,
+        posRef.current.windowSize[0] - props.size[0]
+      ),
+      clamp(
+        2 * posRef.current.initWindowGlobal[1] +
+          e.nativeEvent.pageY -
+          posRef.current.initMouseGlobal[1],
+        0,
+        posRef.current.windowSize[1] - props.size[1]
+      ),
     ];
 
     // console.log(
@@ -66,7 +80,7 @@ export const FloatWindowComponent = (props: InitialProps) => {
     posRef.current.initMouseGlobal = [
       posRef.current.initWindowGlobal[0] + e.nativeEvent.pageX,
       posRef.current.initWindowGlobal[1] + e.nativeEvent.pageY,
-    ]
+    ];
 
     moveWindow();
   };
@@ -87,23 +101,27 @@ export const FloatWindowComponent = (props: InitialProps) => {
     //   `moving to: x=${Math.floor(newWindowGlobal[0])}, y=${Math.floor(newWindowGlobal[1])}`
     // );
 
-    FloatingWindowService.moveFloatWindow(newWindowGlobal[0], newWindowGlobal[1], () => {
-      posRef.current.initMouseGlobal = [
-        newWindowGlobal[0] + posRef.current.initMouseLocal[0],
-        newWindowGlobal[1] + posRef.current.initMouseLocal[1],
-      ]
-      posRef.current.initWindowGlobal = newWindowGlobal;
+    FloatingWindowService.moveFloatWindow(
+      newWindowGlobal[0],
+      newWindowGlobal[1],
+      () => {
+        posRef.current.initMouseGlobal = [
+          newWindowGlobal[0] + posRef.current.initMouseLocal[0],
+          newWindowGlobal[1] + posRef.current.initMouseLocal[1],
+        ];
+        posRef.current.initWindowGlobal = newWindowGlobal;
 
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          posRef.current.isMoving = false;
-        })
-      }, 16);
-    });
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            posRef.current.isMoving = false;
+          });
+        }, 16);
+      }
+    );
   };
 
   useEffect(() => {
-    console.log(props, posRef.current);
+    console.log(props, Dimensions.get("window"), Dimensions.get("screen"));
   }, []);
 
   return (
