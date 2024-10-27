@@ -16,6 +16,11 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.uimanager.ReactShadowNode
 import com.facebook.react.uimanager.ViewManager
 
+/**
+ * PermissionCheck
+ *
+ * 检查并获取应用程序需要的额外动态权限
+ */
 class PermissionCheck(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
     override fun getName(): String {
         return "PermissionCheck"
