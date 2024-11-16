@@ -4,6 +4,13 @@ apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
+def keystoreProperties = new Properties()
+def keystoreFile = rootProject.file("local.properties")
+
+if (keystoreFile.exists()) {
+    keystoreFile.withInputStream { keystoreProperties.load(it) }
+}
+
 static def versionToNumber(major, minor, patch) {
   return patch * 100 + minor * 10000 + major * 1000000
 }
@@ -124,6 +131,13 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+
+        release {
+            storeFile file(keystoreProperties['APP_RELEASE_STORE_FILE'])
+            storePassword keystoreProperties['APP_RELEASE_STORE_PASSWORD']
+            keyAlias keystoreProperties['APP_RELEASE_KEY_ALIAS']
+            keyPassword keystoreProperties['APP_RELEASE_KEY_PASSWORD']
+        }
     }
     buildTypes {
         debug {
@@ -132,7 +146,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
