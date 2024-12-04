@@ -42,13 +42,17 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+hilt {
+    enableAggregatingTask = false
 }
 
 dependencies {
@@ -80,9 +84,9 @@ dependencies {
     implementation(libs.androidx.compose.material3.material3)
 
     // Room
-    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.runtime.v251)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler.v251)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -96,6 +100,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    implementation(libs.gson)
+
+    implementation(libs.javapoet)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

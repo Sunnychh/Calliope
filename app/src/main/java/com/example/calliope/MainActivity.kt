@@ -1,9 +1,10 @@
 package com.example.calliope
 
-import ProfileScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,15 +22,21 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Chat
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.calliope.screens.ChatScreen
-import com.example.calliope.screens.ContactDetailScreen
-import com.example.calliope.screens.HomeScreen
-import com.example.calliope.screens.ProfileDetailScreen
-import com.example.calliope.screens.SettingsScreen
+import com.example.calliope.ui.screens.chat.ChatScreen
+import com.example.calliope.ui.screens.chat.ContactDetailScreen
+import com.example.calliope.ui.screens.HomeScreen
+import com.example.calliope.ui.screens.profile.ProfileDetailScreen
+import com.example.calliope.ui.screens.SettingsScreen
+import com.example.calliope.ui.screens.profile.CreateProfileScreen
+import com.example.calliope.ui.screens.profile.ProfileScreen
+import com.example.calliope.ui.viewmodel.profile.ProfileViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +92,21 @@ fun MainScreen() {
                     }
                 )
             }
+
+// 创建人设页面
+            composable(
+                route = "create_profile",
+                // 添加动画效果使过渡更流畅
+                enterTransition = { slideInHorizontally() },
+                exitTransition = { slideOutHorizontally() }
+            ) {
+                val viewModel: ProfileViewModel = hiltViewModel()
+                CreateProfileScreen(
+                    navController = navController,
+                    viewModel = viewModel
+                )
+            }
+
 
             composable(
                 route = "profile_detail/{profileId}",

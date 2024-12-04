@@ -1,4 +1,4 @@
-package com.example.calliope.screens
+package com.example.calliope.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

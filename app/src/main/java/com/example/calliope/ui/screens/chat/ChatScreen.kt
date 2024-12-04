@@ -1,44 +1,36 @@
-package com.example.calliope.screens
+package com.example.calliope.ui.screens.chat
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.calliope.ui.viewmodel.chat.ChatViewModel
+import com.example.calliope.ui.viewmodel.state.ChatDialogUi
+import com.example.calliope.ui.viewmodel.state.UiState
 
 /**
  * @author Sunny
  * @date 2024/11/08/上午11:48
  */
 @Composable
-fun ChatScreen(navController: NavController) {
+fun ChatScreen(
+    navController: NavController,
+    viewModel: ChatViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -48,7 +40,6 @@ fun ChatScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Title
             Text(
                 text = "Calliope",
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -61,7 +52,6 @@ fun ChatScreen(navController: NavController) {
                 textAlign = TextAlign.Center
             )
 
-            // Content Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -84,44 +74,53 @@ fun ChatScreen(navController: NavController) {
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
-                    // Chat contacts list
-                    ChatContact(
-                        name = "Alice",
-                        description = "高效能沟通者，需要注意压力管理",
-                        onClick = {
-                            navController.navigate("contact_detail/alice")
+                    // Loading indicator
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                    // Error message
+                    uiState.error?.let { error ->
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+
+                    // Chat dialogs list
+                    when (val dialogs = uiState.dialogs) {
+                        is UiState.Success -> {
+                            dialogs.data.forEach { dialog ->
+                                ChatDialogItem(
+                                    dialog = dialog,
+                                    onClick = {
+                                        navController.navigate("contact_detail/${dialog.id}")
+                                    }
+                                )
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 12.dp),
+                                    color = Color(0xFFEEEEEE)
+                                )
+                            }
                         }
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = Color(0xFFEEEEEE)
-                    )
-                    ChatContact(
-                        name = "Bob",
-                        description = "创意丰富，需要帮助提高执行力",
-                        onClick = {
-                            navController.navigate("contact_detail/bob")
+                        is UiState.Error -> {
+                            Text(
+                                text = dialogs.message,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
                         }
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = Color(0xFFEEEEEE)
-                    )
-                    ChatContact(
-                        name = "Charlie",
-                        description = "创新思维者，注重细节的决策者",
-                        onClick = {
-                            navController.navigate("contact_detail/charlie")
+                        UiState.Loading -> {
+                            // Loading state is handled above
                         }
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = Color(0xFFEEEEEE)
-                    )
+                    }
 
                     // Add new contact button
                     Button(
-                        onClick = { /* TODO: Implement add contact */ },
+                        onClick = { /* TODO: Show create dialog */ },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 12.dp),
@@ -154,15 +153,14 @@ fun ChatScreen(navController: NavController) {
 }
 
 @Composable
-private fun ChatContact(
-    name: String,
-    description: String,
+private fun ChatDialogItem(
+    dialog: ChatDialogUi,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)  // 添加点击事件
+            .clickable(onClick = onClick)
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -171,17 +169,25 @@ private fun ChatContact(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = name,
+                text = dialog.name,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Medium
                 )
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = description,
+                text = dialog.description,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            dialog.lastMessage?.let { message ->
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
         }
         Icon(
             imageVector = Icons.Default.ChevronRight,

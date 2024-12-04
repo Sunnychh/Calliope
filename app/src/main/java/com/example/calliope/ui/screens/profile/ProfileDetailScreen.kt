@@ -1,4 +1,4 @@
-package com.example.calliope.screens
+package com.example.calliope.ui.screens.profile
 
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit

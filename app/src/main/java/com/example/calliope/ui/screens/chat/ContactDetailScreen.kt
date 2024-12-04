@@ -1,4 +1,4 @@
-package com.example.calliope.screens
+package com.example.calliope.ui.screens.chat
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

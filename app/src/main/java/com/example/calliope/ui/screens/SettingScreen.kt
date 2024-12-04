@@ -1,4 +1,4 @@
-package com.example.calliope.screens
+package com.example.calliope.ui.screens
 
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.Icons
